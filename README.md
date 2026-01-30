@@ -21,3 +21,9 @@ Oxford-IIIT Pet Dataset
 Work in progress  
 - Dataset preprocessing completed  
 - Model training in progress
+
+# Acknowledgements
+
+This project is implemented as a follow-along learning exercise ispired by Aladdin Persson's U-Net image segmentation tutorials.
+
+While the core model architecture and training approach are based on the tutorial, the dataset preprocessing pipeline, including train-validation splitting and overall project structure, has been independently implemented and customized.
