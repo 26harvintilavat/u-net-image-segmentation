@@ -5,13 +5,15 @@ from torch.utils.data import DataLoader
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-def save_checkpoints(state, filename="my_checkpoints.pth.tar"):
+def save_checkpoint(state, filename="my_checkpoint.pth.tar"):
     print("=> Saving checkpoint")
     torch.save(state, filename)
 
-def load_checkpoint(checkpoint, model):
+def load_checkpoint(checkpoint, model, optimizer=None):
     print("=> Loading checkpoint")
     model.load_state_dict(checkpoint['state_dict'])
+    if optimizer is not None and "optimizer" in checkpoint:
+        optimizer.load_state_dict(checkpoint['optimizer'])
 
 def get_loaders(
         train_dir,
@@ -63,22 +65,34 @@ def check_accuracy(loader, model, device):
     with torch.no_grad():
         for x, y in loader:
             x = x.to(device)
-            y = y.to(device)
+            y = y.to(device).unsqueeze(1)
+            y = (y > 0).float()
+
             preds = torch.sigmoid(model(x))
             preds = (preds > 0.5).float()
-            num_correct += (preds == y).sum()
-            num_pixels += torch.numel(preds)
-            dice_score += (2 * (preds * y).sum()) / (preds + y).sum() + 1e-8
 
-    print(
-        f"Got {num_correct}/{num_pixels} with acc {num_correct/num_pixels*100:.2f}"
-    )
-    print(f"Dice score: {dice_score/len(loader)}")
+            num_correct += (preds == y).sum().item()
+            num_pixels += torch.numel(preds)
+
+            intersection = (preds * y).sum().item()
+            dice_score += (2 * intersection) / (
+                preds.sum().item() + y.sum().item() + 1e-8
+            )
+
+    acc = num_correct / num_pixels * 100
+    dice = dice_score / len(loader)
+
+    print(f"Got {num_correct}/{num_pixels} with acc {acc:.2f}%")
+    print(f"Dice score: {dice:.4f}")
+
     model.train()
 
 def save_predictions_as_imgs(
-        loader, model, folder="saved_images/", device=device
+        loader, model, folder="data/saved_images/", device=device
 ): 
+    import os
+    os.makedirs(folder, exist_ok=True)
+
     model.eval()
     for idx, (x, y) in enumerate(loader):
         x = x.to(device)
@@ -88,6 +102,6 @@ def save_predictions_as_imgs(
         torchvision.utils.save_image(
             preds, f"{folder}/pred_{idx}.png"
         )
-        torchvision.utils.save_image(y.unsqueeze(1), f"{folder}")
+        torchvision.utils.save_image(y.unsqueeze(1), f"{folder}/gt_{idx}.png")
 
     model.train()
