@@ -11,6 +11,14 @@ data/the-oxfordiiit-pet-dataset/
 data/data/processed/
 data/processed/
 
+data/small/train
+data/small/val
+data/saved_images
+
+# model checkpoints
+*.pth 
+*.pth.tar 
+
 # os/ editor files
 .DS_Store
 Thumbs.db
