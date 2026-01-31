@@ -18,7 +18,8 @@ class OxfordIIITPetDataset(Dataset):
         mask_path = os.path.join(self.mask_dir, self.images[index]).replace('.jpg', '.png')
         image = np.array(Image.open(img_path).convert("RGB"))
         mask = np.array(Image.open(mask_path).convert("L"), dtype=np.float32)
-        mask[mask == 255.0] = 1.0
+        
+        mask = (mask > 0).astype(np.float32)
 
         if self.trasnform is not None:
             augmentations = self.trasnform(image=image, mask=mask)
