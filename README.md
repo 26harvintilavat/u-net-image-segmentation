@@ -1,29 +1,69 @@
-# U-Net Image Segmentation
+# U-Net Image Segmentation (Oxford-IIIT Pet)
 
-This project focuses on image segmentation using a U-Net architecture.
-Currently, it includes dataset preparation, splitting, and a modular
-project structure for training a segmentation model.
+This project implements a **U-Net-based image segmentation pipeline** using PyTorch.  
+The goal is to perform **binary segmentation** on pet images from the Oxford-IIIT Pet Dataset.
 
-## Project Structure
-data/
- ├── dataset_download.py
- ├── split_dataset.py
- └── dataset.py
-src/
- ├── model.py
- └── train.py
+The project focuses on:
+- correct data preprocessing
+- stable training
+- proper evaluation using Dice score
+- clean project structure suitable for GitHub
 
+## 🧠 Project Overview
 
-## Dataset
-Oxford-IIIT Pet Dataset
+- **Model**: U-Net (encoder–decoder with skip connections)
+- **Task**: Binary image segmentation
+- **Loss Function**: `BCEWithLogitsLoss`
+- **Metrics**:
+  - Dice Score
+  - Pixel Accuracy
+- **Training**: Mixed Precision Training (AMP)
+- **Augmentation**: Albumentations
 
-## Status
-Work in progress  
-- Dataset preprocessing completed  
-- Model training in progress
+## 📊 Results (Small Subset)
 
-# Acknowledgements
+> ⚠️ **Important Note**  
+> To speed up experimentation and debugging, the model was trained on a **small subset** of the dataset:
+>
+> - **Training images**: 100  
+> - **Validation images**: 20  
+>
+> The reported metrics reflect performance on this small subset and are **not meant to represent full-dataset performance**.
 
-This project is implemented as a follow-along learning exercise ispired by Aladdin Persson's U-Net image segmentation tutorials.
+### Metrics on Validation Set:
+- **Dice Score**: ~0.98  
+- **Pixel Accuracy**: ~97%
 
-While the core model architecture and training approach are based on the tutorial, the dataset preprocessing pipeline, including train-validation splitting and overall project structure, has been independently implemented and customized.
+These results confirm that the **pipeline, metrics, and preprocessing are correct**, not that the model is fully optimized.
+
+## 🗂 Dataset
+
+- **Dataset**: Oxford-IIIT Pet Dataset
+- **Segmentation Type**: Binary (pet vs background)
+
+### Mask Preprocessing
+All segmentation masks are explicitly converted to **binary masks (0 or 1)** during dataset loading to ensure:
+- correct Dice computation
+- stable loss behavior
+- consistent visualization
+
+The dataset itself is **not included** in this repository.
+
+## 🏗 Project Structure
+U-Net-Image-Segmentation/
+│
+├── src/
+│   ├── __init__.py
+│   ├── model.py
+│   ├── train.py
+│   └── utils.py
+│
+├── data/
+|   ├── dataset.py
+│   ├── create_small_dataset.py
+│   ├── dataset_download.py
+│   └── split_dataset.py
+|      
+├── .gitignore
+├── README.md              
+├── requirements.txt
